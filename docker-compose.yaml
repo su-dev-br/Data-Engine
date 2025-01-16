@@ -1,0 +1,82 @@
+# version: '3.8'
+services:
+  spark-master:
+    image: bitnami/spark:latest
+    container_name: spark-master
+    environment:
+      - SPARK_MODE=master
+      - SPARK_MASTER_HOST=spark-master
+    ports:
+      - "6066:6066"  # Spark UI
+      - "7077:7077"  # Spark Master Port
+    networks:
+      - spark-net
+
+  spark-worker:
+    image: bitnami/spark:latest
+    container_name: spark-worker
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+    depends_on:
+      - spark-master
+    networks:
+      - spark-net
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: airflow
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    networks:
+      - spark-net
+
+  # mysql:
+  #   image: mysql:8.0
+  #   container_name: mysql
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: root
+  #     MYSQL_DATABASE: airflow
+  #   ports:
+  #     - "3306:3306"
+  #   networks:
+  #     - spark-net
+
+  airflow:
+    image: apache/airflow:latest
+    ports:
+      - "8081:8081"
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://admin:admin@postgres/airflow
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor 
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+    depends_on:
+      - postgres
+    networks:
+      - spark-net
+    command: /bin/sh ./airflow/airflow_setup.sh
+    restart: always
+    # entrypoint: bash -c "airflow db init && airflow scheduler"
+
+  # mongodb:
+  #   image: mongo:6
+  #   container_name: mongodb
+  #   ports:
+  #     - "27017:27017"
+  #   networks:
+  #     - spark-net
+
+networks:
+  spark-net:
+    driver: bridge
+

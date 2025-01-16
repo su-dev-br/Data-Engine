@@ -1,0 +1,10 @@
+# /path/to/sources.list
+# deb https://www.debian.org/apt/debian-archive-key-bullseye.asc bullseye main
+
+deb http://deb.debian.org/debian bullseye main
+deb http://deb.debian.org/debian-security bullseye-security main
+deb http://deb.debian.org/debian bullseye-updates main
+
+deb [signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] http://deb.debian.org/debian bullseye main
+deb [signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] http://deb.debian.org/debian-security bullseye-security main
+deb [signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] http://deb.debian.org/debian bullseye-updates main
