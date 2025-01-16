@@ -31,3 +31,6 @@ EXPOSE 5000
 
 # Default command
 CMD ["python", "app.py"]
+
+
+
