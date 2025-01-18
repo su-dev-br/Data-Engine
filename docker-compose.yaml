@@ -1,5 +1,56 @@
 # version: '3.8'
 services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/opt/app
+      - ./scripts:/scripts
+    ports:
+      - "8080:8080"
+
+  airflow-webserver:
+    image: apache/airflow:latest
+    container_name: airflow-webserver
+    depends_on:
+      - postgres
+    volumes:
+      - ./airflow/:/opt/airflow/
+      - ./scripts:/scripts
+    ports:
+      - "8081:8081"
+    networks:
+      - shared-net
+    entrypoint: bash -c "/opt/airflow/airflow_setup.sh"
+
+  airflow-scheduler:
+    image: apache/airflow:latest
+    container_name: airflow-scheduler
+    depends_on:
+      - airflow-webserver
+    volumes:
+      - ./airflow/:/opt/airflow/
+      - ./scripts:/scripts
+    networks:
+      - shared-net
+    command: scheduler
+      
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: defaultDB
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - ./DB/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - shared-net
+
   # spark-master:
   #   image: bitnami/spark:latest
   #   container_name: spark-master
@@ -22,35 +73,7 @@ services:
   #     - spark-master
   #   networks:
   #     - spark-net
-
-  postgres:
-    image: postgres:latest
-    container_name: postgres
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: airflow
-      POSTGRES_HOST_AUTH_METHOD: trust
-    ports:
-      - "5432:5432"
-    volumes:
-      - ./DB/postgres:/var/lib/postgresql/data  # Volume for persistent data
-    networks:
-      - spark-net
-
-  airflow:
-    image: apache/airflow:latest
-    ports:
-      - "8081:8081"
-    volumes:
-      - ./airflow/:/opt/airflow/
-    depends_on:
-      - postgres
-    networks:
-      - spark-net
-    entrypoint: bash -c "/opt/airflow/airflow_setup.sh"
-    restart: always
-
+  
   # mysql:
   #   image: mysql:8.0
   #   container_name: mysql
@@ -71,6 +94,8 @@ services:
   #     - spark-net
 
 networks:
+  shared-net:
+    driver: bridge
   spark-net:
     driver: bridge
 

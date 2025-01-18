@@ -6,13 +6,9 @@ USER root
 WORKDIR /app
 
 # Copy the requirements.txt, .env file into the container at /app
-COPY requirements.txt /app/
-COPY .env /app/.env
+COPY requirements.txt /tmp/requirements.txt
 COPY sources.list /etc/apt/sources.list
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
 
 # Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates\
@@ -21,16 +17,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
     curl \
     gpg \
     python3 \
-    python3-pip && \
-    rm -rf /var/lib/apt/lists/*
+    python3-pip
+    # apt-get clean 
+    # rm -rf /var/lib/apt/lists/*
 # apt-get clean 
 
+# Install any needed packages specified in requirements.txt
+RUN pip3 install --upgrade pip
+RUN pip3 install --no-cache-dir -r /tmp/requirements.txt
 
 # Expose Spark ports
 EXPOSE 5000
 
 # Default command
-CMD ["python", "app.py"]
+# CMD ["python", "app.py"]
 
 
 

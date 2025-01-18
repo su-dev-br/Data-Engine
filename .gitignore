@@ -2,3 +2,7 @@
 airflow/airflow-webserver.pid
 airflow/webserver_config.py
 airflow/logs/dag_processor_manager/dag_processor_manager.log
+venv/
+Archive/
+
+__pycache__/
