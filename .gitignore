@@ -1,8 +1,8 @@
 /DB/postgres/
 airflow/airflow-webserver.pid
 airflow/webserver_config.py
-airflow/logs/dag_processor_manager/dag_processor_manager.log
+airflow/logs/
+
 venv/
 Archive/
-
 __pycache__/
