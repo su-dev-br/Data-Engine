@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airflow Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <h1>Airflow Dashboard</h1>
+
+    <h2>DAG Run History</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>DAG ID</th>
+                <th>Execution Date</th>
+                <th>State</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in dag_run_history %}
+            <tr>
+                <td>{{ row[0] }}</td>
+                <td>{{ row[1] }}</td>
+                <td>{{ row[2] }}</td>
+                <td>{{ row[3] }}</td>
+                <td>{{ row[4] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Task Instance History</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Task ID</th>
+                <th>DAG ID</th>
+                <th>Execution Date</th>
+                <th>State</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in task_instance_history %}
+            <tr>
+                <td>{{ row[0] }}</td>
+                <td>{{ row[1] }}</td>
+                <td>{{ row[2] }}</td>
+                <td>{{ row[3] }}</td>
+                <td>{{ row[4] }}</td>
+                <td>{{ row[5] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Task and DAG Runtime Graph</h2>
+    <canvas id="runtimeChart" width="400" height="200"></canvas>
+    <script>
+        const ctx = document.getElementById('runtimeChart').getContext('2d');
+        const data = {
+            labels: ['DAG 1', 'DAG 2', 'DAG 3'],  // Update with dynamic data
+            datasets: [{
+                label: 'Task Runtime',
+                data: [120, 150, 90],  // Replace with dynamic data
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+                fill: false
+            }]
+        };
+        const config = {
+            type: 'line',
+            data: data,
+        };
+        const runtimeChart = new Chart(ctx, config);
+    </script>
+
+</body>
+</html>
